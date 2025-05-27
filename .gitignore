@@ -1,0 +1,74 @@
+# Python 通用忽略规则
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C扩展生成的文件
+*.so
+
+# 运行时生成的文件
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# 虚拟环境目录
+venv/
+ENV/
+env/
+.venv/
+
+# PyCharm IDE 配置文件
+.idea/
+
+# VSCode 配置文件
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# 日志文件
+*.log
+
+# 环境配置文件
+*.env
+.env.*
+
+# Python打包的文件
+*.whl
+*.tar.gz
+
+# macOS 系统文件
+.DS_Store
+
+# Windows 系统文件
+Thumbs.db
+desktop.ini
+
+# pytest缓存
+.cache/
+
+# pip wheel缓存
+pip-wheel-metadata/
+
+# mypy 类型检查缓存
+.mypy_cache/
+
+# pyre 类型检查缓存
+.pyre/
+
+# pytype 缓存
+.pytype/
+
+# Coverage.py 产生的文件
+.coverage
+htmlcov/
+
+# distutils生成的文件
+*.manifest
+*.spec
+
+*.ifc
