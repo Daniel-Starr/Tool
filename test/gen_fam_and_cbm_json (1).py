@@ -27,7 +27,7 @@ def parse_structured_file(file_path):
 
 # 扫描所有 .fam 和 .cbm 文件
 cbm_files = list(Path(data_dir).rglob("*.cbm"))
-fam_files = list(Path(data_dir).rglob("*.fam"))
+
 
 # 分别解析
 parsed_cbm_data = [parse_structured_file(f) for f in cbm_files]

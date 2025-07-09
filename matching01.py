@@ -45,6 +45,7 @@ COLUMN_MAPPING = {
     }
 }
 
+
 @dataclass
 class MatchResult:
     system_code: str
@@ -57,6 +58,7 @@ class MatchResult:
     ref_device_name: str
     similarity: int
 
+
 class DataProcessor:
     def __init__(self, model_path: str, ref_path: str):
         self.model_df = self._load_and_preprocess(model_path, "model_data")
@@ -64,12 +66,17 @@ class DataProcessor:
         self.voltage_groups = self._prepare_reference_data()
 
     def _load_and_preprocess(self, path: str, data_type: str) -> pd.DataFrame:
-        df = pd.read_excel(path, engine='openpyxl')
-        df = self._standardize_columns(df, data_type)
-        df["电压等级"] = df["电压等级"].astype(str).fillna("Unknown")
-        if data_type == "model_data":
-            df["Device_ID"] = df.get("Device_ID", pd.NA)
-        return df
+        try:
+            df = pd.read_excel(path, engine='openpyxl')
+            df = self._standardize_columns(df, data_type)
+            df["电压等级"] = df["电压等级"].astype(str).fillna("Unknown")
+            if data_type == "model_data":
+                df["Device_ID"] = df.get("Device_ID", pd.NA)
+            return df
+        except FileNotFoundError:
+            raise FileNotFoundError(f"文件未找到: {path}")
+        except Exception as e:
+            raise Exception(f"读取文件 {path} 时出错: {str(e)}")
 
     def _standardize_columns(self, df: pd.DataFrame, data_type: str) -> pd.DataFrame:
         column_mapping = {}
@@ -127,25 +134,53 @@ class DataProcessor:
     def _fuzzy_match(query: str, choices: pd.Series) -> List[Tuple[str, int]]:
         if not isinstance(query, str):
             query = str(query) if not pd.isna(query) else ""
+
+        # 确保 choices 是字符串类型且非空
         choices = choices.dropna().astype(str)
-        return [(match, score) for match, score, _ in
-                process.extract(query, choices, scorer=fuzz.token_sort_ratio, limit=3)]
+        choices_list = choices.tolist()
+
+        if not choices_list or not query.strip():
+            return []
+
+        try:
+            # 使用 process.extract 进行模糊匹配
+            matches = process.extract(query, choices_list, scorer=fuzz.token_sort_ratio, limit=3)
+            return [(match, score) for match, score in matches]
+        except Exception as e:
+            print(f"模糊匹配出错: {e}")
+            return []
 
     @staticmethod
     def _is_voltage_match(ref_v: str, model_v: str) -> bool:
         try:
-            return int(re.search(r"\d+", ref_v).group()) == int(re.search(r"\d+", model_v).group())
-        except:
+            ref_match = re.search(r"\d+", ref_v)
+            model_match = re.search(r"\d+", model_v)
+            if ref_match and model_match:
+                return int(ref_match.group()) == int(model_match.group())
+            return False
+        except Exception:
             return False
 
     @staticmethod
     def _build_result(model_row: pd.Series, best: Dict) -> MatchResult:
         similarity = best["score"]
-        status = next((f"{similarity}% " + stars for threshold, stars in [(90, "★★★★"), (70, "★★★"), (50, "★★"), (30, "★"), (0, "")] if similarity >= threshold), "无匹配")
+        status = "无匹配"
+
+        if similarity >= 90:
+            status = f"{similarity}% ★★★★"
+        elif similarity >= 70:
+            status = f"{similarity}% ★★★"
+        elif similarity >= 50:
+            status = f"{similarity}% ★★"
+        elif similarity >= 30:
+            status = f"{similarity}% ★"
+        elif similarity > 0:
+            status = f"{similarity}%"
+
         return MatchResult(
-            system_code=model_row["标识系统编码"],
-            project_name=model_row["工程名称"],
-            model_voltage=model_row["电压等级"],
+            system_code=str(model_row.get("标识系统编码", "")),
+            project_name=str(model_row.get("工程名称", "")),
+            model_voltage=str(model_row.get("电压等级", "")),
             ref_voltage=best.get("voltage", "无匹配"),
             device_type=best["data"]["设备类型_清洗"] if best["data"] is not None else "无匹配",
             physical_id=best["data"]["实物ID"] if best["data"] is not None else "需手动输入",
@@ -154,21 +189,40 @@ class DataProcessor:
             similarity=similarity
         )
 
+
 def generate_initial_report(results: List[MatchResult], model_df: pd.DataFrame, filename: str):
     wb = Workbook()
     ws = wb.active
-    ws.append(["标识系统编码", "工程名称", "model电压", "参考电压", "参考设备类型", "实物ID", "匹配状态", "参考设备名称", "相似度", "Device_ID"])
+    ws.append(
+        ["标识系统编码", "工程名称", "model电压", "参考电压", "参考设备类型", "实物ID", "匹配状态", "参考设备名称",
+         "相似度", "Device_ID"])
+
     for i, r in enumerate(results):
+        device_id = ""
+        if i < len(model_df):
+            device_id = str(model_df.iloc[i].get("Device_ID", ""))
+
         ws.append([
             r.system_code, r.project_name, r.model_voltage, r.ref_voltage,
             r.device_type, r.physical_id, r.match_status, r.ref_device_name,
-            r.similarity, model_df.iloc[i].get("Device_ID", "")
+            r.similarity, device_id
         ])
-    wb.save(filename)
+
+    try:
+        wb.save(filename)
+        print(f"✅ 报告已生成: {filename}")
+    except Exception as e:
+        print(f"❌ 保存报告失败: {e}")
+        raise
+
 
 def launch_manual_correction_gui(filepath: str, ref_df: pd.DataFrame):
-    df = pd.read_excel(filepath)
-    available_ids = sorted(ref_df["实物ID"].dropna().astype(str).unique())
+    try:
+        df = pd.read_excel(filepath)
+        available_ids = sorted(ref_df["实物ID"].dropna().astype(str).unique())
+    except Exception as e:
+        print(f"❌ 启动GUI失败: {e}")
+        return
 
     root = tk.Tk()
     root.title("实物ID手动校对工具")
@@ -201,19 +255,27 @@ def launch_manual_correction_gui(filepath: str, ref_df: pd.DataFrame):
         ttk.Button(popup, text="确定", command=save_selection).pack()
 
     def export_file():
-        df.to_excel("最终修正结果.xlsx", index=False)
-        messagebox.showinfo("导出成功", "文件已保存为：最终修正结果.xlsx")
+        try:
+            df.to_excel("最终修正结果.xlsx", index=False)
+            messagebox.showinfo("导出成功", "文件已保存为：最终修正结果.xlsx")
+        except Exception as e:
+            messagebox.showerror("导出失败", str(e))
 
     tree.bind("<Double-1>", on_double_click)
     ttk.Button(root, text="导出结果", command=export_file).pack(pady=10)
     root.mainloop()
 
+
 def main():
-    processor = DataProcessor("device_data.xlsx", "test_work.xlsx")
-    results = processor.match_devices()
-    generate_initial_report(results, processor.model_df, "智能设备匹配报告-专业版.xlsx")
-    print("✅ 自动匹配完成，已生成初步 Excel 文件。")
-    launch_manual_correction_gui("智能设备匹配报告-专业版.xlsx", processor.ref_df)
+    try:
+        processor = DataProcessor("device_data.xlsx", "test_work.xlsx")
+        results = processor.match_devices()
+        generate_initial_report(results, processor.model_df, "智能设备匹配报告-专业版.xlsx")
+        print("✅ 自动匹配完成，已生成初步 Excel 文件。")
+        launch_manual_correction_gui("智能设备匹配报告-专业版.xlsx", processor.ref_df)
+    except Exception as e:
+        print(f"❌ 主程序执行失败: {e}")
+
 
 if __name__ == "__main__":
     main()
