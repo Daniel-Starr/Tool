@@ -1,0 +1,10 @@
+[设计参数]
+Voltage_grade=电压等级=AC220kV
+Projectname=工程中名称=-
+Ldentification_code=电网工程标识系统编码=-
+Schedulcode=调度编码=-
+Physicalid=实物ID=-
+Affiliated_code=附件编号=-
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#10c74c56-358e-4ad1-ad70-bfe3e72dbbf9
+BasicOnRvt#图面基本图元#true

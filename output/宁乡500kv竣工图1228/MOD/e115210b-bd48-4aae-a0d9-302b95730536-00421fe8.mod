@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Device>
+  <Entities>
+    <Entity ID="1" Type="simple" Visible="True">
+      <Cylinder R="23.3880000000001" H="400" />
+      <TransformMatrix Value="0,0,1,0,0,-1,0,0,1,0,0,0,-200,0,-0.0130188213653751,1" />
+      <Color R="128" G="128" B="255" A="0" />
+    </Entity>
+    <Entity ID="2" Type="simple" Visible="True">
+      <Cylinder R="23.3880000000001" H="146.175000000001" />
+      <TransformMatrix Value="1,0,0,0,0,0,-1,0,0,1,0,0,200,-73.0875000000002,0,1" />
+      <Color R="128" G="128" B="255" A="0" />
+    </Entity>
+    <Entity ID="3" Type="simple" Visible="True">
+      <Cuboid L="81.8580000000003" W="38.9800000000001" H="146.175000000001" />
+      <TransformMatrix Value="1,0,0,0,0,-1,0,0,0,0,-1,0,0,0,0,1" />
+      <Color R="128" G="128" B="255" A="0" />
+    </Entity>
+    <Entity ID="4" Type="simple" Visible="False">
+      <Cylinder R="5" H="3" />
+      <TransformMatrix Value="1,0,0,0,0,0,-1,0,0,1,0,0,-200,0,0,1" />
+      <Color R="128" G="128" B="255" A="0" />
+    </Entity>
+    <Entity ID="5" Type="simple" Visible="False">
+      <Cylinder R="5" H="3" />
+      <TransformMatrix Value="1,0,0,0,0,0,-1,0,0,1,0,0,200,0,0,1" />
+      <Color R="128" G="128" B="255" A="0" />
+    </Entity>
+    <Entity ID="6" Type="simple" Visible="True">
+      <Cylinder R="23.3880000000001" H="146.175000000001" />
+      <TransformMatrix Value="1,0,0,0,0,0,-1,0,0,1,0,0,-200,-73.0875000000002,0,1" />
+      <Color R="128" G="128" B="255" A="0" />
+    </Entity>
+  </Entities>
+</Device>

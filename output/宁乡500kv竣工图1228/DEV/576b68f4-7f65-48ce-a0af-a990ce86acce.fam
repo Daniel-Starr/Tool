@@ -1,0 +1,11 @@
+[设计参数]
+mingcheng=名称=TY液压型T形线夹
+xinghao=型号=TY-400/50
+changjia=厂家=四平线路器材厂
+danzhong=单重=1.9
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#导线外径#27.63
+null#导线半径#13.815
+null#旋转角度#0.011102039943202
+null#角度#6.13873127410716

@@ -1,0 +1,13 @@
+[设计参数]
+mingcheng=名称=SY压缩型设备线夹（0°）
+xinghao=型号=SY-240/30A
+changjia=厂家=四平线路器材厂
+danzhong=单重=0.54
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#线夹角度#0
+null#辅助角度#-4.36332312998582
+null#导线外径#21.6
+null#导线半径#10.8
+null#旋转角度#-5.93411945678072
+null#角度#-1.5707963267949

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(dir dist)",
+      "Bash(\"工程数据模型挂接工具.exe\" --help)",
+      "Bash(powershell:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

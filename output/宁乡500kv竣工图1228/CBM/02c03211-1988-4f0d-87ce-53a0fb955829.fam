@@ -1,0 +1,7 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统
+NAME=名称=500kV
+fujianbianhao=附件编号=
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#f8184ebc-bcb9-4f5e-8f88-c57283e81256
+SystemTreeTypeGUID#系统树分类唯一标识#5437cf69-bb9b-46e4-9928-1da117a20304

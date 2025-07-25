@@ -1,0 +1,9 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统/T 主变系统
+fujianbianhao=附件编号=
+FIRETYPE=消防类型=
+AREANAME=区域名称=
+AREACOVERED=占地面积=
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#3997346f-f6d0-4e03-8693-08015bf16456
+SystemTreeTypeGUID#系统树分类唯一标识#87446759-038a-4399-a30e-d226efb69b1c

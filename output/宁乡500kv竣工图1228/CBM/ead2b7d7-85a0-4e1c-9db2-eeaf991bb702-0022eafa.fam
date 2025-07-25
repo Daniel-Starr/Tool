@@ -1,0 +1,14 @@
+[设计参数]
+Projectname=工程中名称=-
+DianWangGCBiaoShiXiTongBianMa=电网工程标识系统编码=-
+DP_AttachedDrawingNumber=附件编号=-
+DP_Space=工程系统=-
+DP_Type=类型=雨水泵池
+DP_NO=模型编码=-
+DP_PlateType=盖板类型=-
+DP_MaterialQuality=材质=-
+DP_MaterialStrength=材质强度=-
+DP_Thickness=壁厚(mm)=220
+DP_Hight=高度(mm)=3500
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#-1

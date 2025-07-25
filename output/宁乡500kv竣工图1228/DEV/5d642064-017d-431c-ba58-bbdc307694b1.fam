@@ -1,0 +1,14 @@
+[设计参数]
+mingcheng=名称=SSY压缩型双导线设备线夹（0°）
+xinghao=型号=SSY-630/55A-200
+changjia=厂家=四平线路器材厂
+danzhong=单重=3.3
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#分裂间距#200
+null#线夹角度#0
+null#辅助角度#1.5707963267949
+null#导线外径#34.3199999999999
+null#导线半径#17.16
+null#旋转角度#0
+null#角度#-1.5707963267949

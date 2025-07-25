@@ -1,0 +1,11 @@
+[设计参数]
+name=名称=双分裂间隔棒（大截面导线用MRJ型）
+speci=型号=MRJ-1400-400
+chuangjia=厂家=南京线路器材厂
+danzhong=单重=2.5
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#e34f1af0-eae7-40eb-9333-75fe738a7d09
+null#分裂间距#400
+null#r#58.4699999999999
+null#导线外半径#19.49
+null#角度#-0.143665691358627

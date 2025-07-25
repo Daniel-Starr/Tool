@@ -1,0 +1,11 @@
+[设计参数]
+mingcheng=名称=双导线单引下T型线夹（TL型）
+xinghao=型号=TL-630N/200
+changjia=厂家=南京线路器材厂
+danzhong=单重=8.8
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#分裂间距#200
+null#导线外径#27.63
+null#旋转角度#-0.0665855401321228
+null#角度#1.20151654426777

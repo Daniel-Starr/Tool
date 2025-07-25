@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import os
 from fuzzywuzzy import process, fuzz
 from openpyxl import Workbook
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -11,6 +12,9 @@ from typing import Dict, List, Set, Tuple
 from dataclasses import dataclass
 import tkinter as tk
 from tkinter import ttk, messagebox
+
+# 配置日志
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # 样式设置
 STYLE_CONFIG = {
@@ -66,17 +70,85 @@ class DataProcessor:
         self.voltage_groups = self._prepare_reference_data()
 
     def _load_and_preprocess(self, path: str, data_type: str) -> pd.DataFrame:
+        """
+        安全加载并预处理Excel文件
+        
+        Args:
+            path: 文件路径
+            data_type: 数据类型 ('model_data' 或 'reference_data')
+            
+        Returns:
+            预处理后的DataFrame
+            
+        Raises:
+            FileNotFoundError: 文件不存在
+            PermissionError: 无权限访问文件
+            ValueError: 文件格式或数据错误
+        """
+        # 路径安全检查
+        if not self._validate_file_path(path):
+            raise ValueError(f"不安全的文件路径: {path}")
+            
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"文件未找到: {path}")
+            
+        if not os.access(path, os.R_OK):
+            raise PermissionError(f"无权限读取文件: {path}")
+            
         try:
+            # 检查文件大小，防止加载过大文件
+            file_size = os.path.getsize(path)
+            if file_size > 100 * 1024 * 1024:  # 100MB 限制
+                raise ValueError(f"文件过大 ({file_size / 1024 / 1024:.1f}MB)，请使用较小的文件")
+            
+            logging.info(f"正在加载文件: {path} ({file_size / 1024:.1f}KB)")
+            
             df = pd.read_excel(path, engine='openpyxl')
+            
+            if df.empty:
+                raise ValueError(f"文件为空: {path}")
+                
             df = self._standardize_columns(df, data_type)
             df["电压等级"] = df["电压等级"].astype(str).fillna("Unknown")
+            
             if data_type == "model_data":
                 df["Device_ID"] = df.get("Device_ID", pd.NA)
+                
+            logging.info(f"成功加载 {len(df)} 行数据")
             return df
-        except FileNotFoundError:
-            raise FileNotFoundError(f"文件未找到: {path}")
+            
+        except pd.errors.ExcelFileError as e:
+            raise ValueError(f"Excel文件格式错误: {e}")
+        except MemoryError:
+            raise MemoryError(f"内存不足，无法加载文件: {path}")
         except Exception as e:
+            logging.error(f"读取文件 {path} 时出错: {str(e)}")
             raise Exception(f"读取文件 {path} 时出错: {str(e)}")
+    
+    def _validate_file_path(self, path: str) -> bool:
+        """
+        验证文件路径安全性
+        
+        Args:
+            path: 文件路径
+            
+        Returns:
+            bool: 路径是否安全
+        """
+        # 规范化路径
+        normalized_path = os.path.normpath(path)
+        
+        # 检查路径遍历攻击
+        if '..' in normalized_path or normalized_path.startswith('/'):
+            return False
+            
+        # 检查文件扩展名
+        allowed_extensions = {'.xlsx', '.xls', '.csv'}
+        _, ext = os.path.splitext(normalized_path.lower())
+        if ext not in allowed_extensions:
+            return False
+            
+        return True
 
     def _standardize_columns(self, df: pd.DataFrame, data_type: str) -> pd.DataFrame:
         column_mapping = {}

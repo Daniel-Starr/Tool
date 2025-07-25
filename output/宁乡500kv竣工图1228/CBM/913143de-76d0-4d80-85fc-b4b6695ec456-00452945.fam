@@ -1,0 +1,9 @@
+[设计参数]
+shuliang=数量=1
+Projectname=工程中名称=-
+DianWangGCBiaoShiXiTongBianMa=电网工程标识系统编码=-
+DiaoDuBianMa=调度编码=-
+RealID=实物ID=-
+DP_AttachedDrawingNumber=附件编号=-
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#892b61c0-b841-4b35-8948-9b94fd771519

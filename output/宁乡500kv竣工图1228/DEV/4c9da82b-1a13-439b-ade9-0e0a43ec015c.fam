@@ -1,0 +1,10 @@
+[设计参数]
+mingcheng=名称=NYH焊接型耐张线夹(配引流线夹)（液压型）
+xinghao=型号=NYH-1440N/1440/135N
+changjia=厂家=四平线路器材厂
+danzhong=单重=16
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#导线外径#38.9800000000001
+null#导线半径#19.49
+null#角度#1.5707963267949

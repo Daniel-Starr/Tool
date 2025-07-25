@@ -1,0 +1,13 @@
+[设计参数]
+mingcheng=名称=大截面导线设备线夹（SY压缩型）
+xinghao=型号=SY-1400A
+changjia=厂家=南京线路器材厂
+danzhong=单重=2.6
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#线夹角度#0
+null#辅助角度#4.71258416776391
+null#导线外径#27.63
+null#导线半径#13.815
+null#旋转角度#3.14178784096901
+null#角度#-0.37934872603439

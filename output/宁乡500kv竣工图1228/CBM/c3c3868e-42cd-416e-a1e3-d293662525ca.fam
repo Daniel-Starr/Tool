@@ -1,0 +1,7 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统/E 220kV系统/B 断路器间隔
+name=名称=#1ML
+fujianbianhao=附件编号=
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#f1e11e8a-ae8c-4593-9bac-929c5edab363
+SystemTreeTypeGUID#系统树分类唯一标识#FFFECC4F-430B-4946-B903-3ABDC1A841A1

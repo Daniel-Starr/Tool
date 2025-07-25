@@ -1,0 +1,7 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统/T 主变系统/A 变压器本体
+name=名称=避雷器3
+fujianbianhao=附件编号=
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#e1612c45-9efa-4951-bbd5-10907ec38fc1
+SystemTreeTypeGUID#系统树分类唯一标识#27E44FCC-4EB0-4D79-BD8B-D8DD13D4D6AE

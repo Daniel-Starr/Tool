@@ -1,0 +1,10 @@
+[设计参数]
+mingcheng=名称=NY液压型耐张线夹
+xinghao=型号=NY-630/55A(B)
+changjia=厂家=四平线路器材厂
+danzhong=单重=7.9
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#导线外径#34.3199999999999
+null#导线半径#17.16
+null#角度#1.5707963267949

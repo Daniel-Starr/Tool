@@ -1,0 +1,7 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统/E 220kV系统/B 断路器间隔
+name=名称=#2 ZB
+fujianbianhao=附件编号=
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#787c3fb7-3a1f-4dc0-91cd-f7534684b8ab
+SystemTreeTypeGUID#系统树分类唯一标识#FFFECC4F-430B-4946-B903-3ABDC1A841A1

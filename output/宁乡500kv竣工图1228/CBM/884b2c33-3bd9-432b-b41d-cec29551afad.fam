@@ -1,0 +1,7 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统/C 500kV系统/B 断路器间隔
+name=名称=第六串
+fujianbianhao=附件编号=
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#e3c48bf1-968e-4e5e-83ba-3257731b5e21
+SystemTreeTypeGUID#系统树分类唯一标识#98B13178-103A-4721-B04F-8FC26E73CD4D

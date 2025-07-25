@@ -1,0 +1,7 @@
+[设计参数]
+SYSCLASSIFYNAME=系统分类=A 电气系统/H 35kV系统/B 断路器间隔
+fujianbianhao=附件编号=
+name=名称=35KV总回路
+[STD-R自定义参数]
+SystemTreeNodeGUID#系统树节点唯一标识#34958a26-1168-4f8d-b612-98b5878f7a4f
+SystemTreeTypeGUID#系统树分类唯一标识#1f2a8315-9213-4dbd-adfc-d59f9d0e1a07

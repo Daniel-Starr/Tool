@@ -1,0 +1,14 @@
+[设计参数]
+mingcheng=名称=双导线单引下T型线夹（TL型）
+xinghao=型号=TL-1440N/200
+changjia=厂家=南京线路器材厂
+danzhong=单重=10.7
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#分裂间距#400
+null#导线外径#38.9800000000001
+null#导线半径#19.49
+null#旋转角度#3.08373497563968
+null#角度#5.22436768708227
+null#角度3#2.62961394689221
+null#角度2#1.05881762009731

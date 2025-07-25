@@ -1,0 +1,14 @@
+[设计参数]
+mingcheng=名称=SSY压缩型双导线设备线夹（0°）
+xinghao=型号=SSY-1440N/200A(h*a)
+changjia=厂家=四平线路器材厂
+danzhong=单重=0
+[STD-R自定义参数]
+ObjectTypeGuid#OBJECTTYPEGUID#0e1a9485-c543-4776-aacd-78cb42a312bf
+null#分裂间距#200
+null#线夹角度#0
+null#辅助角度#4.71287771015575
+null#导线外径#38.9800000000001
+null#导线半径#19.49
+null#旋转角度#3.14208138336086
+null#角度#-1.44642249321822
