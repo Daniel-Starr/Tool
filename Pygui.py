@@ -80,12 +80,12 @@ class App:
         button_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=5)
 
         button_configs = [
-            ("导入", self._import_action, "选择并解压.gim文件"),
-            ("导出设备清单", self._export_action, "从模型数据生成设备Excel清单"),
-            ("参数文件", self._param_action, "选择实物ID清单并自动处理"),
-            ("挂接", self._mount_action, "自动匹配模型与实物ID"),
-            ("载入", self._load_action, "将挂接结果写回模型文件"),
-            ("保存", self._save_action, "将修改后的文件重新打包为.gim")
+            ("导入GIM模型", self._import_action, "选择并解压.gim文件"),
+            ("加载GIM数据", self._export_action, "从模型数据生成设备Excel清单"),
+            ("导入实物ID", self._param_action, "选择实物ID清单并自动处理"),
+            ("数据挂接", self._mount_action, "自动匹配模型与实物ID"),
+            ("数据载入", self._load_action, "将挂接结果写回模型文件"),
+            ("保存GIM模型", self._save_action, "将修改后的文件重新打包为.gim")
         ]
 
         self.buttons = {}

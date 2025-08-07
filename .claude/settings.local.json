@@ -8,7 +8,10 @@
       "Bash(dir dist)",
       "Bash(\"工程数据模型挂接工具.exe\" --help)",
       "Bash(powershell:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(rm:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
