@@ -70,7 +70,7 @@ class App:
             if os.path.exists(icon_path):
                 self.root.iconbitmap(icon_path)
         except tk.TclError:
-            self.log("ℹ️ 未找到或无法设置窗口图标 (app.ico)。")
+            self.log("未找到或无法设置窗口图标 (app.ico)。")
         self.root.configure(bg='#f0f0f0')
         self.root.minsize(800, 600)
 
@@ -652,47 +652,366 @@ class App:
 
     def _param_action(self) -> None:
         """选择参数文件并自动处理"""
-        file_path = filedialog.askopenfilename(
-            title="选择参数文件 (实物ID清单)",
-            filetypes=[("Excel/CSV 文件", "*.xlsx;*.xls;*.csv"), ("所有文件", "*.*")],
-            initialdir=self.gim_extract_dir if self.gim_extract_dir else os.getcwd()
-        )
-        if not file_path:
-            self.log("ℹ️ 用户取消了文件选择。")
+        # 创建选择对话框
+        root = tk.Toplevel(self.root)
+        root.title("导入实物ID")
+        root.geometry("400x250")
+        root.transient(self.root)
+        root.grab_set()
+        
+        # 居中显示
+        root.update_idletasks()
+        x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
+        y = (root.winfo_screenheight() // 2) - (root.winfo_height() // 2)
+        root.geometry(f"+{x}+{y}")
+        
+        # 结果变量
+        self._file_selection_result = None
+        
+        # 标题
+        title_label = tk.Label(root, text="请选择参数文件来源", 
+                              font=("微软雅黑", 14, "bold"))
+        title_label.pack(pady=20)
+        
+        # 按钮框架
+        button_frame = tk.Frame(root)
+        button_frame.pack(pady=20, fill="x", padx=40)
+        
+        def select_single_file():
+            """选择单个Excel文件"""
+            file_path = filedialog.askopenfilename(
+                title="选择参数文件 (实物ID清单)",
+                filetypes=[("Excel文件", "*.xlsx;*.xls"), ("CSV文件", "*.csv"), ("所有文件", "*.*")],
+                initialdir=self.gim_extract_dir if self.gim_extract_dir else os.getcwd()
+            )
+            if file_path:
+                self._file_selection_result = {"type": "single", "files": [file_path]}
+                root.destroy()
+        
+        def select_multiple_files():
+            """选择多个Excel文件进行整合"""
+            file_paths = filedialog.askopenfilenames(
+                title="选择多个Excel文件进行整合",
+                filetypes=[("Excel文件", "*.xlsx;*.xls"), ("所有文件", "*.*")],
+                initialdir=self.gim_extract_dir if self.gim_extract_dir else os.getcwd()
+            )
+            if file_paths:
+                self._file_selection_result = {"type": "multiple", "files": list(file_paths)}
+                root.destroy()
+        
+        
+        def cancel_selection():
+            """取消选择"""
+            self._file_selection_result = None
+            root.destroy()
+        
+        # 按钮
+        btn1 = tk.Button(button_frame, text="导入单个Excel文件", 
+                        command=select_single_file, 
+                        width=25, height=2, font=("微软雅黑", 10))
+        btn1.pack(pady=5)
+        
+        btn2 = tk.Button(button_frame, text="导入多个Excel文件", 
+                        command=select_multiple_files, 
+                        width=25, height=2, font=("微软雅黑", 10))
+        btn2.pack(pady=5)
+        
+        btn3 = tk.Button(button_frame, text="取消", 
+                        command=cancel_selection, 
+                        width=25, height=1, font=("微软雅黑", 10))
+        btn3.pack(pady=10)
+        
+        # 说明文字
+        info_text = ("数据处理选项：\n"
+                    "• 单个文件：导入一个Excel实物ID清单\n"
+                    "• 多个文件：导入并整合多个Excel文件")
+        
+        info_label = tk.Label(root, text=info_text, 
+                             font=("微软雅黑", 9), 
+                             justify="left", fg="gray")
+        info_label.pack(pady=10, padx=20)
+        
+        # 等待用户选择
+        self.root.wait_window(root)
+        
+        if not self._file_selection_result:
+            self.log("用户取消了操作。")
             return
-
+        
+        # 根据选择结果处理文件
+        selection = self._file_selection_result
+        
         def task():
             """在后台线程中处理文件的任务"""
             try:
-                self.log(f"🚀 正在自动处理参数文件: {os.path.basename(file_path)}")
-                # 处理参数文件，不显示弹窗预览
-                result_path = handle_param_file(file_path, show_preview=False)
+                if selection["type"] == "single":
+                    file_path = selection["files"][0]
+                    self.log(f"正在处理单个文件: {os.path.basename(file_path)}")
+                    result_path = handle_param_file(file_path, show_preview=False)
+                    success_msg = f"单个文件处理成功: {result_path}"
+                    
+                elif selection["type"] == "multiple":
+                    file_paths = selection["files"]
+                    self.log(f"正在处理 {len(file_paths)} 个文件...")
+                    for i, fp in enumerate(file_paths):
+                        self.log(f"  {i+1}. {os.path.basename(fp)}")
+                    
+                    # 检查是否是四个compound文件
+                    if self._is_compound_files(file_paths):
+                        self.log("检测到compound四文件，执行专业数据处理...")
+                        result_path = self._process_compound_files(file_paths)
+                        success_msg = f"Compound四文件处理完成: {result_path}"
+                    else:
+                        result_path = handle_param_file({"type": "custom_multiple", "files": file_paths}, show_preview=False)
+                        success_msg = f"多文件整合处理成功: {result_path}"
+                    
                 
                 # 在可视化数据框中显示参数数据
                 self.root.after(0, lambda: display_param_data(self.mount_frame, result_path))
                 
-                success_msg = f"参数文件已成功处理！\n标准参考文件已生成: {result_path}"
-                self.log(f"✅ {success_msg.replace(chr(10), ' ')}")
-                
-                return f"参数文件处理完成并显示: {result_path}"
+                self.log(f"√ {success_msg}")
+                return f"参数文件处理完成: {result_path}"
 
             except Exception as e:
-                error_msg = f"处理参数文件时发生错误:\n{e}"
-                self.log(f"❌ {error_msg.replace(chr(10), ' ')}")
+                error_msg = f"处理参数文件时发生错误: {e}"
+                self.log(f"× {error_msg}")
                 raise
 
-        self._run_async_task(task, "参数文件自动处理")
+        self._run_async_task(task, "参数文件处理")
+
+    def _is_compound_files(self, file_paths: list) -> bool:
+        """检查是否是compound的四个文件"""
+        if len(file_paths) != 4:
+            return False
+        
+        required_filenames = [
+            "物资技术参数.xls",
+            "设备交接实验.xls", 
+            "设备安装调试.xls",
+            "设备实物ID (3).xls"
+        ]
+        
+        selected_filenames = [os.path.basename(fp) for fp in file_paths]
+        
+        # 检查是否包含所有必需文件
+        for required in required_filenames:
+            if required not in selected_filenames:
+                return False
+        
+        return True
+
+    def _process_compound_files(self, file_paths: list) -> str:
+        """处理compound四个文件：复制到compound文件夹，然后整合+提取"""
+        import shutil
+        
+        try:
+            # 确保compound文件夹存在
+            compound_dir = "compound"
+            os.makedirs(compound_dir, exist_ok=True)
+            
+            # 将文件复制到compound文件夹
+            self.log("  步骤1: 准备compound文件...")
+            for file_path in file_paths:
+                filename = os.path.basename(file_path)
+                target_path = os.path.join(compound_dir, filename)
+                
+                # 检查是否是同一个文件 - 使用绝对路径比较
+                abs_source = os.path.abspath(file_path)
+                abs_target = os.path.abspath(target_path)
+                
+                if abs_source == abs_target:
+                    self.log(f"    文件已在位置: {filename}")
+                else:
+                    shutil.copy2(file_path, target_path)
+                    self.log(f"    复制: {filename}")
+            
+            # 执行compound数据处理流程
+            result_path = self._process_compound_data()
+            return result_path
+            
+        except Exception as e:
+            self.log(f"  × Compound文件处理失败: {e}")
+            raise
+
+    def _process_compound_data(self) -> str:
+        """处理compound文件夹中的四个文件：整合+提取"""
+        import subprocess
+        import sys
+        
+        try:
+            # 步骤1: 四合一数据整合并去重
+            self.log("  步骤1: 四合一整合并去重...")
+            result = subprocess.run([sys.executable, "compound_data_integration.py"], 
+                                  capture_output=True, text=True, encoding='utf-8')
+            if result.returncode != 0:
+                self.log(f"  × 数据整合失败: {result.stderr}")
+                raise Exception(f"数据整合失败: {result.stderr}")
+            
+            integrated_file = "compound/compound_整合数据_完整版.xlsx"
+            if os.path.exists(integrated_file):
+                self.log(f"  √ 生成整体文件: {integrated_file}")
+            
+            # 步骤2: 信息提取生成核心匹配字段
+            self.log("  步骤2: 提取设备信息生成核心字段...")
+            result = subprocess.run([sys.executable, "extract_equipment_info.py"], 
+                                  capture_output=True, text=True, encoding='utf-8')
+            if result.returncode != 0:
+                self.log(f"  ! 信息提取警告: {result.stderr}")
+                # 信息提取失败不是致命错误，继续处理
+            
+            # 检查生成的核心匹配字段文件
+            core_file = "compound/设备信息_核心匹配字段.xlsx"
+            if os.path.exists(core_file):
+                self.log("  √ 生成核心匹配字段文件")
+                self._show_compound_simple_results()
+                return core_file
+            else:
+                raise Exception("未找到核心匹配字段文件")
+                
+        except Exception as e:
+            self.log(f"  × Compound数据处理失败: {e}")
+            raise
+
+    def _show_compound_results(self) -> None:
+        """显示compound数据处理结果统计"""
+        try:
+            import pandas as pd
+            report_file = "compound/精准设备匹配报告.xlsx"
+            
+            if os.path.exists(report_file):
+                df = pd.read_excel(report_file)
+                total = len(df)
+                successful = len(df[df['匹配状态'] == '成功匹配'])
+                high_conf = len(df[df['置信度'].isin(['极高', '高'])])
+                
+                self.log(f"  匹配统计:")
+                self.log(f"    - 总设备数: {total}")
+                self.log(f"    - 成功匹配: {successful} ({successful/total*100:.1f}%)")
+                self.log(f"    - 高置信度: {high_conf} ({high_conf/total*100:.1f}%)")
+                
+        except Exception as e:
+            self.log(f"  ! 无法显示结果统计: {e}")
+
+    def _show_compound_simple_results(self) -> None:
+        """显示compound数据处理简单结果统计"""
+        try:
+            import pandas as pd
+            core_file = "compound/设备信息_核心匹配字段.xlsx"
+            integrated_file = "compound/compound_整合数据_完整版.xlsx"
+            
+            if os.path.exists(core_file):
+                df = pd.read_excel(core_file)
+                total = len(df)
+                has_name = df['设备名称'].notna().sum() if '设备名称' in df.columns else 0
+                has_type = df['设备类型'].notna().sum() if '设备类型' in df.columns else 0
+                
+                self.log(f"  数据处理统计:")
+                self.log(f"    - 总设备数: {total}")
+                self.log(f"    - 有设备名称: {has_name}")
+                self.log(f"    - 有设备类型: {has_type}")
+                
+        except Exception as e:
+            self.log(f"  ! 无法显示结果统计: {e}")
+
+    def _display_compound_results(self, report_file: str) -> None:
+        """显示compound数据处理结果的专用界面"""
+        try:
+            import pandas as pd
+            
+            # 清空现有的mount_frame内容
+            for widget in self.mount_frame.winfo_children():
+                widget.destroy()
+            
+            # 创建标题
+            title_frame = tk.Frame(self.mount_frame, bg='#f0f0f0')
+            title_frame.pack(fill=tk.X, pady=(0, 10))
+            
+            title_label = tk.Label(title_frame, 
+                                 text="Compound数据处理结果", 
+                                 font=("微软雅黑", 16, "bold"),
+                                 bg='#f0f0f0', fg='#2c3e50')
+            title_label.pack(side=tk.LEFT)
+            
+            # 读取匹配报告
+            df = pd.read_excel(report_file)
+            
+            # 创建统计信息框
+            stats_frame = tk.LabelFrame(self.mount_frame, text="处理统计", 
+                                      font=("微软雅黑", 12, "bold"))
+            stats_frame.pack(fill=tk.X, pady=(0, 10), padx=5)
+            
+            total = len(df)
+            successful = len(df[df['匹配状态'] == '成功匹配'])
+            high_conf = len(df[df['置信度'].isin(['极高', '高'])])
+            
+            stats_text = (f"总设备数: {total}  |  "
+                         f"成功匹配: {successful} ({successful/total*100:.1f}%)  |  "
+                         f"高置信度: {high_conf} ({high_conf/total*100:.1f}%)")
+            
+            stats_label = tk.Label(stats_frame, text=stats_text, 
+                                 font=("微软雅黑", 10),
+                                 bg='#e8f5e8', fg='#2e7d32')
+            stats_label.pack(fill=tk.X, padx=10, pady=8)
+            
+            # 显示数据表格（使用现有的display_param_data功能）
+            display_param_data(self.mount_frame, report_file)
+            
+            # 添加操作按钮框
+            button_frame = tk.Frame(self.mount_frame, bg='#f0f0f0')
+            button_frame.pack(fill=tk.X, pady=10)
+            
+            # 打开详细报告按钮
+            open_report_btn = tk.Button(button_frame, 
+                                      text="打开详细报告", 
+                                      command=lambda: self._open_file_location(report_file, True),
+                                      font=("微软雅黑", 10),
+                                      bg='#2196f3', fg='white',
+                                      relief=tk.RAISED, bd=2)
+            open_report_btn.pack(side=tk.LEFT, padx=5)
+            
+            # 打开compound文件夹按钮
+            compound_dir = os.path.dirname(report_file)
+            open_folder_btn = tk.Button(button_frame, 
+                                      text="打开结果文件夹", 
+                                      command=lambda: self._open_file_location(compound_dir),
+                                      font=("微软雅黑", 10),
+                                      bg='#4caf50', fg='white',
+                                      relief=tk.RAISED, bd=2)
+            open_folder_btn.pack(side=tk.LEFT, padx=5)
+            
+        except Exception as e:
+            self.log(f"× 显示compound结果失败: {e}")
+            # 回退到普通显示方式
+            display_param_data(self.mount_frame, report_file)
 
     def _mount_action(self) -> None:
         """执行挂接操作"""
         if not self._check_gim_imported(): return
-        if not os.path.exists("device_data.xlsx") or not os.path.exists("test_work.xlsx"):
-            messagebox.showwarning("文件缺失", "请先执行“导出设备清单”和“参数文件”步骤。")
+        
+        # 检查数据文件是否存在（支持compound数据处理结果）
+        device_file = "device_data.xlsx"
+        param_file = "test_work.xlsx"
+        compound_core = "compound/设备信息_核心匹配字段.xlsx"
+        
+        # 优先使用compound数据处理结果
+        if os.path.exists(compound_core):
+            self.log("检测到compound核心匹配数据，将使用compound数据进行挂接")
+            param_file = compound_core
+        elif not os.path.exists(device_file) or not os.path.exists(param_file):
+            missing_files = []
+            if not os.path.exists(device_file):
+                missing_files.append("device_data.xlsx")
+            if not os.path.exists(param_file):
+                missing_files.append("test_work.xlsx")
+            
+            # 简洁的错误提示
+            missing_files_text = "、".join(missing_files)
+            messagebox.showwarning("文件缺失", f"缺少必需文件: {missing_files_text}\n请先完成数据准备步骤。")
             return
 
         def task():
             try:
-                self.log("🔗 正在执行挂接操作...")
+                self.log("正在执行挂接操作...")
                 # run_and_display_matching现在直接在主线程中创建UI组件，所以使用after
                 self.root.after(0, run_and_display_matching, self.mount_frame)
                 return "挂接与匹配完成，请在界面上校对结果。"
@@ -710,7 +1029,7 @@ class App:
 
         def task():
             try:
-                self.log("📂 正在将实物ID载入模型文件...")
+                self.log("正在将实物ID载入模型文件...")
                 result = apply_real_id_to_fam(base_path=self.gim_extract_dir, strict=True)
                 return result
             except Exception as e:
@@ -724,7 +1043,7 @@ class App:
 
         def task():
             try:
-                self.log("💾 正在封装GIM文件...")
+                self.log("正在封装GIM文件...")
                 output_gim_path = self.gim_path.replace(".gim", "_已挂接.gim")
                 extractor = GIMExtractor(self.gim_path)
 
